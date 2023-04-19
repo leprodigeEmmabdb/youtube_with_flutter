@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gestion_fidele/controllers/HistoriqueCtrl.dart';
 import 'package:gestion_fidele/controllers/UserCtrl.dart';
 import 'package:gestion_fidele/controllers/YoutubeCtrl.dart';
 import 'package:gestion_fidele/controllers/YoutubeCtrl.dart';
@@ -14,23 +15,23 @@ import '../utils/Stockage.dart';
 
 import 'HistoriquePage.dart';
 import 'LogiPage.dart';
-import 'ProfilPage.dart';
+import 'DetailPage.dart';
 
-class TubeBoard extends StatefulWidget {
-  const TubeBoard({Key? key}) : super(key: key);
+class HistoriquePage extends StatefulWidget {
+  const HistoriquePage({Key? key}) : super(key: key);
 
   @override
-  State<TubeBoard> createState() => _TubeBoardState();
+  State<HistoriquePage> createState() => _HistoriquePageState();
 }
 
-class _TubeBoardState extends State<TubeBoard> {
+class _HistoriquePageState extends State<HistoriquePage> {
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      var youtubectrl = context.read<YoutubeCtrl>();
-      youtubectrl.recupererDataAPI();
+      var historiquectrl = context.read<HistoriqueCtrl>();
+      historiquectrl.recupererHistApi();
     });
   }
 
@@ -43,14 +44,14 @@ class _TubeBoardState extends State<TubeBoard> {
   }
 
   AppBar _appBar() {
-    //var youtubectrl = context.watch<YoutubeCtrl>();
+    var historiquectrl = context.watch<HistoriqueCtrl>();
 
     return AppBar(
       title: Row(
         children: [
-          Icon(Icons.youtube_searched_for),
+          Icon(Icons.list_alt),
           Text(
-            "YouTube",
+            "Historique(${historiquectrl.historique.length})",
             style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
           ),
         ],
@@ -67,8 +68,8 @@ class _TubeBoardState extends State<TubeBoard> {
             },
             color: Colors.white,
             icon: Tooltip(
-                message: 'Historique',
-                child: Icon(Icons.access_time_outlined))),
+                message: 'Historique ',
+                )),
         IconButton(
             onPressed: () {
               var userCtrl = context.read<UserCtrl>();
@@ -85,55 +86,42 @@ class _TubeBoardState extends State<TubeBoard> {
   }
 
   Widget _body() {
-    Color couleur=Colors.black45;
     var userCtrl = context.watch<UserCtrl>();
-    var youtube = context.watch<YoutubeCtrl>();
+    var tube = context.watch<HistoriqueCtrl>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Text("Connecté en tant que: ${userCtrl.user?.username}")),
+
 
         Expanded(
           child: ListView.builder(
               shrinkWrap: true,
-              itemCount: youtube.video.length,
+              itemCount: tube.historique.length,
               itemBuilder: (ctx, i) {
-                var f = youtube.video[i];
-
+                var f = tube.historique[i];
 
 
                 //var f = FidelModele.fromJson(fidele);
 
                 //  return Text("${f.id}");
-                return ListTile(onTap:(){
-                  Map data={'action' : 'vous avez lu la video'};
-                  youtube.envoieApi(data);
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (_) => ProfilPage(video_id: f.id,)));
-                } ,
-                    title: Text("${f.title}"),
-                    subtitle: Text("${f.content}"),
-                    trailing: IconButton(
-                        onPressed: () {
+                return ListTile(
+                  title: Text("${f.action}"),
+                 subtitle: Text("le ${f.createdAt.day}/${f.createdAt.month}/${f.createdAt.year}"),
+                  trailing: IconButton(
+                      onPressed: () {
 
-                          var userCtrl = context.read<UserCtrl>();
-                          userCtrl.stockage?.remove(Stockage.userKey);
-                          Map data={'action' : 'vous avez telecharger la video'};
-                          youtube.envoieApi(data);
-
-                          setState(() {
-                            couleur=Colors.red;
-                          });
-                        },
-                        color: couleur,
-                    icon: Icon(Icons.add_alert_sharp)),
-                    leading:f.video != null ? Image.network(
-                        "${Constance.BASE_URL}/${f.video}") : Icon(Icons.error),
-                    onLongPress: ()
-                {},);
+                        var userCtrl = context.read<UserCtrl>();
+                        userCtrl.stockage?.remove(Stockage.userKey);
+                       // Map data={'action' : 'vous avez telecharger la video'};
+                        //tube.envoieApi(data);
+                      /* Navigator.push(
+                            context, MaterialPageRoute(builder: (_) => DetailPage(video_id: f.id,)));*/
+                      },
+                      icon: Icon(Icons.delete,color: Colors.red,)),
+                  leading: new Image.asset("assets/you.png",height: 30,),
+                  onLongPress: ()
+                  {},);
               }),
         ),
       ],

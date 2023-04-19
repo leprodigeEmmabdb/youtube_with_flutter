@@ -13,8 +13,8 @@ import '../models/Youtube.dart';
 import '../utils/Constance.dart';
 
 class YoutubeCtrl with ChangeNotifier {
-  List<Youtube> video = [];
-  List<Youtube> historique = [];
+  List<YoutubeModele> video = [];
+  List<YoutubeModele> historique = [];
   bool loading = false;
   GetStorage? stockage;
   YoutubeCtrl({this.stockage});
@@ -63,8 +63,8 @@ class YoutubeCtrl with ChangeNotifier {
 
     if (reponse != null) {
 
-      List<Youtube> tmp = reponse
-          .map<Youtube>((data) => Youtube.fromJson(data))
+      List<YoutubeModele> tmp = reponse
+          .map<YoutubeModele>((data) => YoutubeModele.fromJson(data))
           .toList();
       video = tmp;
 
@@ -75,7 +75,7 @@ class YoutubeCtrl with ChangeNotifier {
     else{
       var dataStockee=stockage?.read(Stockage.videokey) ;
       print("test data $dataStockee");
-      var tmp=dataStockee.map<Youtube>((e)=> Youtube.fromJson(e)).toList();
+      var tmp=dataStockee.map<YoutubeModele>((e)=> YoutubeModele.fromJson(e)).toList();
       video = tmp;
       print("Mes donnees : $tmp");
     }
@@ -89,7 +89,7 @@ class YoutubeCtrl with ChangeNotifier {
     var reponse = await getData(url);
     if (reponse != null) {
 
-      List<Youtube> tmp = reponse
+      List<YoutubeModele> tmp = reponse
           .map<Historique>((data) => Historique.fromJson(data))
           .toList();
       historique = tmp;

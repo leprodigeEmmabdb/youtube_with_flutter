@@ -6,6 +6,5 @@ class Constance{
   static String histopriqueEndpoint="api/create";
   static String listhistoriqueEndpoint="api/historiques";
 
-  //http://10.20.20.142:8000/storage/img/Yope.jpg
 
 }

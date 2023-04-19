@@ -49,7 +49,6 @@ class HistoriqueCtrl with ChangeNotifier {
       historique = tmp;
       stockage?.write(Stockage.videokey, reponse);
       notifyListeners();
-      print("mon test $historique");
     }
     else{
       var dataStockee=stockage?.read(Stockage.videokey) ;
@@ -71,3 +70,6 @@ void main() {
   // var f = HistoriqueCtrl();
   // f.recupererHistApi();
 }
+
+
+

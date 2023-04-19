@@ -4,12 +4,12 @@
 
 import 'dart:convert';
 
-Youtube youtubeFromJson(String str) => Youtube.fromJson(json.decode(str));
+YoutubeModele youtubeFromJson(String str) => YoutubeModele.fromJson(json.decode(str));
 
-String youtubeToJson(Youtube data) => json.encode(data.toJson());
+String youtubeToJson(YoutubeModele data) => json.encode(data.toJson());
 
-class Youtube {
-  Youtube({
+class YoutubeModele {
+  YoutubeModele({
     required this.id,
     required this.title,
     required this.content,
@@ -21,7 +21,7 @@ class Youtube {
   String? content;
   String? video;
 
-  factory Youtube.fromJson(Map<String, dynamic> json) => Youtube(
+  factory YoutubeModele.fromJson(Map<String, dynamic> json) => YoutubeModele(
     id: json["id"],
     title: json["title"],
     content: json["content"],

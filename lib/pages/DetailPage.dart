@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:gestion_fidele/Widget/Chargement.dart';
 import 'package:gestion_fidele/controllers/YoutubeCtrl.dart';
 import 'package:gestion_fidele/controllers/UserCtrl.dart';
+import 'package:gestion_fidele/models/Youtube.dart';
 import 'package:gestion_fidele/pages/TubeBoard.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -16,24 +17,20 @@ import '../Widget/Chargement.dart';
 import '../controllers/YoutubeCtrl.dart';
 import '../utils/Constance.dart';
 
-class ProfilPage extends StatefulWidget {
+class DetailPage extends StatefulWidget {
   int? video_id;
   @override
-  State<ProfilPage> createState() => _LoginPageState();
-  ProfilPage({this.video_id});
+  State<DetailPage> createState() => _LoginPageState();
+  DetailPage({this.video_id});
 }
 
-class _LoginPageState extends State<ProfilPage> {
+class _LoginPageState extends State<DetailPage> {
+  YoutubeModele? videoSelect;
   Color fondcolor = Colors.white;
 
   String message = "";
   bool isVisible = false;
   var formKey = GlobalKey<FormState>();
-  var tubedesc = TextEditingController();
-  var password = TextEditingController();
-  var tubetitle = TextEditingController();
-  var age = TextEditingController();
-  var image = TextEditingController();
   final ImagePicker picker = ImagePicker();
   XFile? imageSelectionner;
   @override
@@ -41,14 +38,11 @@ class _LoginPageState extends State<ProfilPage> {
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      var fideleCtrl = context.read<YoutubeCtrl>();
-      var data=fideleCtrl.recupererDataAPI();
-      var fidele=fideleCtrl.video.where((f) => f.id ==widget.video_id ).toList();
-      if(fidele.length!=0){
-        var tmp=fidele[0];
-        tubetitle = TextEditingController(text: tmp.title);
-        tubedesc = TextEditingController(text: tmp.content);
-        image = TextEditingController(text: tmp.video);
+      var youtubectrl = context.read<YoutubeCtrl>();
+      var data=youtubectrl.recupererDataAPI();
+      var select=youtubectrl.video.where((f) => f.id ==widget.video_id ).toList();
+      if(select.length!=0){
+        videoSelect=select[0];
         setState(() {
 
         });
@@ -66,7 +60,7 @@ class _LoginPageState extends State<ProfilPage> {
     var userCtrl = context.read<UserCtrl>();
     return Scaffold(
       appBar: AppBar(
-        title: Text("Profil"),
+        title: Text("Video"),
         backgroundColor: Colors.red,
       ),
       backgroundColor: fondcolor,
@@ -84,7 +78,7 @@ class _LoginPageState extends State<ProfilPage> {
         child: Container(
           child: SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 _iconApp(),
@@ -100,19 +94,19 @@ class _LoginPageState extends State<ProfilPage> {
                 Container(
                   child: Column(
                     children: [
-                      Text(" ${tubedesc.text} ${tubetitle.text} ",style: TextStyle(
+                      Text(" ${videoSelect?.title} ${videoSelect?.content} ",style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.black
                       ),),
-                      Text("${tubetitle.text}",
+                      Text("${videoSelect?.title}",
                           style:
                       TextStyle(fontWeight: FontWeight.bold, fontSize: 15,color: Colors.black45)),
                     ],
                   ),
 
                 ),
-                _add(),
+                //_add(),
                 SizedBox(
                   height: 20,
                 ),
@@ -133,9 +127,9 @@ class _LoginPageState extends State<ProfilPage> {
   }
 
   Widget _iconApp() {
-    return Image.network("${Constance.BASE_URL}/${image.text}");
+    return Image.network("${Constance.BASE_URL}/${videoSelect?.video}",width: double.infinity,);
   }
-  Widget _add(){
+  /*Widget _add(){
     var fideleCtrl = context.watch<YoutubeCtrl>();
     return Container(child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -156,7 +150,7 @@ class _LoginPageState extends State<ProfilPage> {
         )
       ],
     ));
-  }
+  }*/
   Widget _buttonWidget(BuildContext ctx) {
     return Container(
       width: 500,
@@ -177,21 +171,19 @@ class _LoginPageState extends State<ProfilPage> {
 //}
 
   void _validateFormulaire () async {
-    print(tubetitle.text);
-    print(tubetitle.text);
-    print(tubetitle.text);
+
     FocusScope.of(context).requestFocus(new FocusNode());
 
     if(formKey.currentState?.validate()!=true){
       return;
     }
 
-    Map dataAenvoyer={
-      "Nom":tubetitle.text,
-      "Prenom":tubedesc.text,
-      "Age":int.parse(age.text),
-      "Image":"",
-    };
+    // Map dataAenvoyer={
+    //   "Nom":tubetitle.text,
+    //   "Prenom":tubedesc.text,
+    //   "Age":int.parse(age.text),
+    //   "Image":"",
+    // };
 
 
   }
