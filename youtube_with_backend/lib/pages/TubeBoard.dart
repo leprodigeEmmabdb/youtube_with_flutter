@@ -1,5 +1,6 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:gestion_fidele/controllers/HistoriqueCtrl.dart';
 import 'package:gestion_fidele/controllers/UserCtrl.dart';
 import 'package:gestion_fidele/controllers/YoutubeCtrl.dart';
 import 'package:gestion_fidele/controllers/YoutubeCtrl.dart';
@@ -17,21 +18,21 @@ import 'HistoriquePage.dart';
 import 'LogiPage.dart';
 import 'DetailPage.dart';
 
-class HistoriquePage extends StatefulWidget {
-  const HistoriquePage({Key? key}) : super(key: key);
+class TubeBoard extends StatefulWidget {
+  const TubeBoard({Key? key}) : super(key: key);
 
   @override
-  State<HistoriquePage> createState() => _HistoriquePageState();
+  State<TubeBoard> createState() => _TubeBoardState();
 }
 
-class _HistoriquePageState extends State<HistoriquePage> {
+class _TubeBoardState extends State<TubeBoard> {
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      var historiquectrl = context.read<HistoriqueCtrl>();
-      historiquectrl.recupererHistApi();
+      var youtubectrl = context.read<YoutubeCtrl>();
+      youtubectrl.getVideoFromServer();
     });
   }
 
@@ -44,14 +45,14 @@ class _HistoriquePageState extends State<HistoriquePage> {
   }
 
   AppBar _appBar() {
-    var historiquectrl = context.watch<HistoriqueCtrl>();
+    //var youtubectrl = context.watch<YoutubeCtrl>();
 
     return AppBar(
       title: Row(
         children: [
-          Icon(Icons.list_alt),
+          Icon(Icons.youtube_searched_for),
           Text(
-            "Historique(${historiquectrl.historique.length})",
+            "YouTube",
             style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
           ),
         ],
@@ -68,8 +69,8 @@ class _HistoriquePageState extends State<HistoriquePage> {
             },
             color: Colors.white,
             icon: Tooltip(
-                message: 'Historique ',
-                )),
+                message: 'Historique',
+                child: Icon(Icons.access_time_outlined))),
         IconButton(
             onPressed: () {
               var userCtrl = context.read<UserCtrl>();
@@ -86,42 +87,50 @@ class _HistoriquePageState extends State<HistoriquePage> {
   }
 
   Widget _body() {
+    Color couleur=Colors.black45;
     var userCtrl = context.watch<UserCtrl>();
-    var tube = context.watch<HistoriqueCtrl>();
+    var youtube = context.watch<YoutubeCtrl>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
+        Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Text("Connecté en tant que: ${userCtrl.user?.username}")),
 
         Expanded(
           child: ListView.builder(
               shrinkWrap: true,
-              itemCount: tube.historique.length,
+              itemCount: youtube.video.length,
               itemBuilder: (ctx, i) {
-                var f = tube.historique[i];
+                var f = youtube.video[i];
 
+                return ListTile(onTap:(){
+                  Map data={'action' : 'vous avez lu la video'};
+                  youtube.sendHistoriqueData(data);
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (_) => DetailPage(video_id: f.id,)));
+                } ,
+                    title: Text("${f.title}"),
+                    subtitle: Text("${f.content}"),
+                    trailing: IconButton(
+                        onPressed: () {
 
-                //var f = FidelModele.fromJson(fidele);
+                          var userCtrl = context.read<UserCtrl>();
+                          userCtrl.stockage?.remove(Stockage.userKey);
+                          Map data={'action' : 'vous avez telecharger la video'};
+                          youtube.sendHistoriqueData(data);
 
-                //  return Text("${f.id}");
-                return ListTile(
-                  title: Text("${f.action}"),
-                 subtitle: Text("le ${f.createdAt.day}/${f.createdAt.month}/${f.createdAt.year}"),
-                  trailing: IconButton(
-                      onPressed: () {
-
-                        var userCtrl = context.read<UserCtrl>();
-                        userCtrl.stockage?.remove(Stockage.userKey);
-                       // Map data={'action' : 'vous avez telecharger la video'};
-                        //tube.envoieApi(data);
-                      /* Navigator.push(
-                            context, MaterialPageRoute(builder: (_) => DetailPage(video_id: f.id,)));*/
-                      },
-                      icon: Icon(Icons.delete,color: Colors.red,)),
-                  leading: new Image.asset("assets/you.png",height: 30,),
-                  onLongPress: ()
-                  {},);
+                          setState(() {
+                            couleur=Colors.red;
+                          });
+                        },
+                        color: couleur,
+                    icon: Icon(Icons.download)),
+                    leading:f.video != null ? Image.network(
+                        "${Constance.BASE_URL}/${f.video}") : Icon(Icons.error),
+                    onLongPress: ()
+                {},);
               }),
         ),
       ],

@@ -20,33 +20,11 @@ class YoutubeCtrl with ChangeNotifier {
   YoutubeCtrl({this.stockage});
 
 
-  Future<bool> envoieDonneesAuth(Map data) async {
-    var url = Uri.parse("${Constance.BASE_URL}${Constance.authEndpoint}");
-    var dataStr = json.encode(data);
-    var reponse = await http.post(url, body: dataStr);
-    print("status : ${reponse.statusCode}");
-    if (reponse.statusCode == 200) {
-      Map bodymap = json.decode(reponse.body);
-      print(bodymap['id']);
+  Future<bool> sendHistoriqueData(Map data) async {
 
-      return true;
-    }
-    return false;
-  }
-
-  Future<bool> envoieApi(Map data) async {
-
-    var url = Uri.parse("${Constance.BASE_URL}${Constance.histopriqueEndpoint}");
-
-    var headers = {
-      'Content-Type': 'application/json'
-    };
-    var dataStr = json.encode(data);
-    var reponse = await http.post(url,headers: headers, body: dataStr);
-
-    if (reponse.statusCode == 200) {
-      Map bodymap = json.decode(reponse.body);
-
+    var url = "${Constance.BASE_URL}${Constance.histopriqueEndpoint}";
+    var reponse = await postData(url, data);
+    if (reponse != null) {
       return true;
     }
     return false;
@@ -54,13 +32,11 @@ class YoutubeCtrl with ChangeNotifier {
 
 
 
-  void recupererDataAPI() async {
+  void getVideoFromServer() async {
     var url = "${Constance.BASE_URL}${Constance.videoEndpoint}";
     loading = true;
     notifyListeners();
     var reponse = await getData(url);
-
-
     if (reponse != null) {
 
       List<YoutubeModele> tmp = reponse
@@ -74,10 +50,8 @@ class YoutubeCtrl with ChangeNotifier {
     }
     else{
       var dataStockee=stockage?.read(Stockage.videokey) ;
-      print("test data $dataStockee");
       var tmp=dataStockee.map<YoutubeModele>((e)=> YoutubeModele.fromJson(e)).toList();
       video = tmp;
-      print("Mes donnees : $tmp");
     }
     loading=false;
     notifyListeners();
@@ -106,32 +80,9 @@ class YoutubeCtrl with ChangeNotifier {
     notifyListeners();
 }
 
-void main() {
-  var f = YoutubeCtrl();
-  f.recupererDataAPI();
-}
+// void main() {
+//   var f = YoutubeCtrl();
+//   f.recupererDataAPI();
+// }
 
-/*
-class User {
-   String? name;
-   int? age;
-
-  User({ this.name, this.age});
-}
-
-void main() {
-  var mapList = [{'name': 'John', 'age': 30}, {'name': 'Jane', 'age': 40}];
-  var userList = mapList.map((item) => User(name: item['name'] as String,age: item['age'] as int)).toList();
-  userList.forEach((user) {
-    print("Nom : ${user.name}, Age: ${user.age}");
-  });
-
-
-
-  var data = jsonEncode(userList);
-  print(data);
-  print("="*20);
-  print(userList.length);
-  print(userList); // [Instance of 'User', Instance of 'User']
-}*/
 }

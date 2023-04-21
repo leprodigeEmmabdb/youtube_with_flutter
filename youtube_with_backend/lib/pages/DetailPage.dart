@@ -27,7 +27,6 @@ class DetailPage extends StatefulWidget {
 class _LoginPageState extends State<DetailPage> {
   YoutubeModele? videoSelect;
   Color fondcolor = Colors.white;
-
   String message = "";
   bool isVisible = false;
   var formKey = GlobalKey<FormState>();
@@ -39,7 +38,6 @@ class _LoginPageState extends State<DetailPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       var youtubectrl = context.read<YoutubeCtrl>();
-      var data=youtubectrl.recupererDataAPI();
       var select=youtubectrl.video.where((f) => f.id ==widget.video_id ).toList();
       if(select.length!=0){
         videoSelect=select[0];
@@ -55,9 +53,6 @@ class _LoginPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
-
-    var fideleCtrl = context.watch<YoutubeCtrl>();
-    var userCtrl = context.read<UserCtrl>();
     return Scaffold(
       appBar: AppBar(
         title: Text("Video"),

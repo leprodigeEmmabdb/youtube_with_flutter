@@ -17,26 +17,19 @@ class HistoriqueCtrl with ChangeNotifier {
   bool loading = false;
   GetStorage? stockage;
   HistoriqueCtrl({this.stockage});
-  Future<bool> envoieApi(Map data) async {
 
-    var url = Uri.parse("${Constance.BASE_URL}${Constance.histopriqueEndpoint}");
+  Future<bool> sendDataToServer(Map data) async {
+    var url = "${Constance.BASE_URL}${Constance.histopriqueEndpoint}";
+    var response = await postData(url, data).timeout(Duration(seconds: 3));
 
-    var headers = {
-      'Content-Type': 'application/json'
-    };
-    var dataStr = json.encode(data);
-    var reponse = await http.post(url,headers: headers, body: dataStr);
-
-    if (reponse.statusCode == 200) {
-      Map bodymap = json.decode(reponse.body);
+    if (response.statusCode == 200) {
+      Map bodymap = json.decode(response.body);
 
       return true;
     }
     return false;
   }
-
-
-  void recupererHistApi() async{
+  void getDataFromServer() async{
     var url = "${Constance.BASE_URL}${Constance.listhistoriqueEndpoint}";
     loading = true;
     notifyListeners();
@@ -61,15 +54,22 @@ class HistoriqueCtrl with ChangeNotifier {
     loading=false;
     notifyListeners();
   }
-
-
-
+  void handleDetelePress(int id) async{
+    var url="${Constance.BASE_URL}${Constance.listhistoriqueEndpoint}/$id";
+    loading = true;
+    notifyListeners();
+    print(url);
+    var response= await deleteData(url);
+    if(response !=null){
+      print("suppression réussie ");
+    }
+  }
 }
-void main() {
-  // var url = "${Constance.BASE_URL}${Constance.listhistoriqueEndpoint}";
-  // var f = HistoriqueCtrl();
-  // f.recupererHistApi();
-}
+// void main() {
+//   var url = "${Constance.BASE_URL}${Constance.listhistoriqueEndpoint}";
+//   var f = HistoriqueCtrl();
+//   f.recupererHistApi();
+// }
 
 
 
