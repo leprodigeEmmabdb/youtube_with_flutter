@@ -1,0 +1,6 @@
+li{
+    list-style: none;
+}
+li :hover{
+    color: rgb(15, 145, 231)!important;
+}
